@@ -29,6 +29,7 @@ git clone https://github.com/puiggrosd/massive_ingest.git
 cd massive_ingest
 ```
 Build and Start the Services
+
 ```
 docker-compose up --build
 ```
@@ -53,18 +54,33 @@ The following environment variables are configured in the docker-compose.yml fil
     - BACKEND: Service name for the backend.
 
 ## How works
-JSON Data
-
 The ingest_data_worker service is responsible for ingesting JSON data. To load JSON data, place your files in the appropriate directory and ensure the ingest_data_worker.py script is set up to process them.
 Image Data
 
 The ingest_image_worker service handles image data ingestion. Place your images in the ./image_data directory. The ingest_image_worker.py script will process these images.
 
+You can send request (look at test.sh and test_siege.sh) and the requests will be processed by the fastapi endpoint that will delegate to workers using rabbit. You can monitor rabbit queies and check using the other endpoints the elements processed.
+
+
+Be careful with the image_data folder that will get big.
 ## Usage
+
+Run the docker and try different ingest_data_worker number to increase the parallelism:
 ```
 docker compose up --scale ingest_data_worker=8
 docker exec -it massive_ingest-base-1 bash
+```
+
 and in the console of docker container bash test_siege.sh
 you can also run test_siege.sh in your console
 
+
+You can also check execution progress in:
+
+```
+
+http://localhost:15672/#/  (guest/guest)
+http://localhost:8000/docs#  (stats, and stats-progress methods)
+http://localhost:8000/stats
+http://localhost:8000/stats-postgres
 ```
